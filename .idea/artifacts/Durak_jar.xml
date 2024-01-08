@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Durak:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Durak_jar</output-path>
+    <root id="archive" name="Durak.jar">
+      <element id="module-output" name="Durak" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/JColor-5.5.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
