@@ -115,7 +115,7 @@ public class GameAction {
      *
      * @param defenderCard отбивающаяся карта
      * @param attackerCard подкинутая карта
-     * @param trumpSuit    козырная масть
+     * @param trumpSuit козырная масть
      * @return результат
      */
     public static boolean isCardValidForDefence(Card defenderCard, Card attackerCard, Suit trumpSuit) {

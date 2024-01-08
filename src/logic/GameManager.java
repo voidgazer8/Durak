@@ -5,6 +5,7 @@ import cards.Rank;
 import cards.Suit;
 import packs.BasicPack;
 import players.Player;
+import players.PlayerService;
 
 import java.util.*;
 
@@ -21,10 +22,18 @@ public class GameManager {
     private List<Player> players; //игроки
     private int savedDefenderIndex;
 
+    public GameManager(int randomPlayersNumber) {
+        setUpBasicPack();
+        setUpPlayers(randomPlayersNumber);
+        findTrumpCard();
+        dealCards();
+        findFirstTurnPlayerIndex();
+    }
+
     /**
      * сформировать первоначачальную колоду и перетасовать
      */
-    public void setUpBasicPack() {
+    private void setUpBasicPack() {
         pack = new BasicPack();
         pack.shuffle();
     }
@@ -34,7 +43,7 @@ public class GameManager {
      *
      * @param howManyPlayers кол-во игроков
      */
-    public void setUpPlayers(int howManyPlayers) {
+    private void setUpPlayers(int howManyPlayers) {
         this.howManyPlayers = howManyPlayers;
 
         players = new ArrayList<>(howManyPlayers);
@@ -46,7 +55,7 @@ public class GameManager {
     /**
      * раздать карты
      */
-    public void dealCards() {
+    private void dealCards() {
         for (int i = 0; i < Player.DEFAULT_CARDS_NUMBER_PER_PLAYER; i++) {
             for (int j = 1; j <= howManyPlayers; j++) {
                 Player currentPlayer = players.get(j - 1);
@@ -58,15 +67,17 @@ public class GameManager {
     /**
      * найти козырную карту
      */
-    public void findTrumpCard() {
+    private void findTrumpCard() {
         pack.findTrumpCard();
     }
 
     /**
      * узнать, кто ходит первым
      */
-    public void findFirstTurnPlayerIndex() {
-        firstTurnPlayerIndex = getPlayerIndexWithGeneralMinRank(getMinRanksOfPlayers(pack.getTrumpCard().getSuit()));
+    private void findFirstTurnPlayerIndex() {
+        Rank[] minRanks = GameService.collectMinRanksOfPlayers(pack.getTrumpCard().getSuit(), players);
+
+        firstTurnPlayerIndex = GameService.getPlayerIndexWithGeneralMinRank(minRanks);
         //на этом этапе либо найдено наименьшее достоинство козырной масти и существует игрок с
         //такой картой, либо нет (ни у кого нет такой масти)
 
@@ -126,7 +137,7 @@ public class GameManager {
             }
 
             //получение индексов подкидывающих игроков
-            List<Integer> attackers = getAttackersIndices(defenderIndex);
+            List<Integer> attackers = GameService.collectAttackersIndices(defenderIndex, players.size());
 
             //создание нового игрового события, передаем имя отбивающегося игрока
             GameAction action = new GameAction(players.get(defenderIndex - 1).getUserIdentifier());
@@ -159,14 +170,14 @@ public class GameManager {
 
                 //спрашиваем у игрока, сколько карт он хочет подкинуть, при этом передав номер захода и размер
                 //руки отбивающегося, чтобы соблюсти правила
-                int numberOfCardsToDiscard = Player.howManyToDiscard(defender.getCards().size(), attackCount);
+                int numberOfCardsToDiscard = PlayerService.howManyToDiscard(defender.getCards().size(), attackCount);
                 attackCount++;
 
                 for (int i = 0; i < numberOfCardsToDiscard; i++) {
                     Card attackerCard;
 
                     //спрашиваем у игрока, какую в данный момент карту он хочет подкинуть
-                    int attackCardIndex = Player.whatToDiscard(action.getAttackValidCardsIndices(attacker.getCards()));
+                    int attackCardIndex = PlayerService.whatToDiscard(action.getAttackValidCardsIndices(attacker.getCards()));
                     if (attackCardIndex == -1) {
                         break; //не может ничего больше подкинуть
                     } else {
@@ -177,7 +188,7 @@ public class GameManager {
                     }
 
                     //спрашиваем у отбивающегося, какой картой он планирует крыть подкинутую карту
-                    int defenceCardIndex = Player.whatToDiscard(
+                    int defenceCardIndex = PlayerService.whatToDiscard(
                             GameAction.getDefenceValidCardsIndices(defender.getCards(), attackerCard, pack.getTrumpCard().getSuit()));
 
                     if (defenceCardIndex == -1) {
@@ -255,67 +266,6 @@ public class GameManager {
                 break;
             }
         }
-    }
-
-    /**
-     * получить индексы подкидывающих игроков по часовой стрелке, учитывая, кто ходит первым
-     *
-     * @param defenderIndex индекс отбивающегося
-     * @return список индексов
-     */
-    private List<Integer> getAttackersIndices(int defenderIndex) {
-        List<Integer> attackers = new ArrayList<>();
-        for (int i = 1; i <= players.size(); i++) {
-            if (i == defenderIndex) {
-                continue;
-            }
-            attackers.add(i);
-        }
-        int firstAttacker = defenderIndex - 1;
-
-        if (defenderIndex == 1) {
-            firstAttacker = players.size();
-        }
-
-        List<Integer> subList = new ArrayList<>(attackers.subList(attackers.indexOf(firstAttacker), attackers.size()));
-        attackers.removeAll(subList);
-        subList.addAll(attackers);
-
-        return subList;
-    }
-
-    /**
-     * получить индекс игрока, у которого имеется общий минимальный номинал карты
-     *
-     * @param ranksForPlayers минимальные номиналы для каждого из игроков
-     * @return индекс
-     */
-    private int getPlayerIndexWithGeneralMinRank(Rank[] ranksForPlayers) {
-        Rank rank = Arrays.stream(ranksForPlayers)
-                .filter(Objects::nonNull)
-                .min(Comparator.comparing(Rank::ordinal))
-                .orElse(null);
-
-        int i = 1;
-        for (Rank current : ranksForPlayers) {
-            if (current != null && current.equals(rank)) {
-                return i;
-            }
-            i++;
-        }
-        return -1;
-    }
-
-    /**
-     * получить минимальные номиналы с определенной мастью для всех игроков
-     *
-     * @param suit масть
-     * @return массив номиналов
-     */
-    private Rank[] getMinRanksOfPlayers(Suit suit) {
-        return players.stream()
-                .map(x -> x.getLowestRankOfSuit(suit))
-                .toArray(Rank[]::new);
     }
 
     public Card getTrumpCard() {

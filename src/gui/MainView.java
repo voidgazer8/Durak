@@ -52,8 +52,8 @@ public class MainView extends JFrame {
     /**
      * вывести инф-цию о действиях отбивающегося
      *
-     * @param defenceMap   сопоставление подкинутой карты и карты в защиту
-     * @param defenderId   id отбивающегося
+     * @param defenceMap сопоставление подкинутой карты и отбивающейся карты
+     * @param defenderId  id отбивающегося
      * @param attackResult результат - отбился или забирает карты
      */
     private void displayDefenderInfo(Map<Card, Card> defenceMap, String defenderId, boolean attackResult) {

@@ -10,7 +10,7 @@ import java.util.*;
  * класс описывает основную колоду, которая тасуется и с которой сдаются карты игрокам
  */
 public class BasicPack {
-    private final LinkedList<Card> deckOfCards = new LinkedList<>();
+    private final ArrayList<Card> deckOfCards = new ArrayList<>();
     private Card trumpCard, lastDealtCard; //козырная и последняя сданная карты
 
     public BasicPack() {
@@ -27,8 +27,8 @@ public class BasicPack {
      */
     public void findTrumpCard() {
         try {
-            Card upperOne = deckOfCards.pollLast(); //снимаем верхнюю карту
-            deckOfCards.addFirst(upperOne); //и перемещаем в низ стопки (начало списка = низ)
+            Card upperOne = pollLast(); //снимаем верхнюю карту
+            deckOfCards.add(0, upperOne); //и перемещаем в низ стопки (начало списка = низ)
             trumpCard = upperOne;
         } catch (NoSuchElementException ex) {
             //если все карты розданы и в колоде ничего не осталось, в козырные уходят параметры последней отданной карты
@@ -49,9 +49,16 @@ public class BasicPack {
      * @return верхняя карта
      */
     public Card getUpperOne() {
-        Card card = deckOfCards.pollLast();
-        lastDealtCard = card;
-        return card;
+        Card upperOne = pollLast();
+        lastDealtCard = upperOne;
+        return upperOne;
+    }
+
+    private Card pollLast() {
+        int last = deckOfCards.size() - 1;
+        Card upperOne = deckOfCards.get(last);
+        deckOfCards.remove(last);
+        return upperOne;
     }
 
     public int getSize() {
