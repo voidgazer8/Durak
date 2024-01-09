@@ -33,7 +33,7 @@ public class PlayerService {
      */
     public static int whatToDiscard(List<Integer> validIndices) {
         if (validIndices.size() == 0) {
-            return -1; //если доступных карт нет, то игрок ничего не подкидывает
+            return -1; //если доступных карт нет, то игрок ничего не сбрасывает
         }
         int n = new Random().nextInt(0, validIndices.size());
         return validIndices.get(n);

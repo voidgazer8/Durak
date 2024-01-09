@@ -78,7 +78,7 @@ public class MainView extends JFrame {
             String s = (state == 0) ? " ничего не подкидывает" : " подкидывает:";
             main.append("Игрок " + attacker + s + separator);
             if (state != 0) {
-                showUpCards(attackers.get(attacker).stream().toList());
+                showUpCards(attackers.get(attacker));
             }
         }
     }

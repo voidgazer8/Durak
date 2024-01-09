@@ -2,7 +2,6 @@ package logic;
 
 import cards.Card;
 import cards.Rank;
-import cards.Suit;
 import packs.BasicPack;
 import players.Player;
 import players.PlayerService;
@@ -15,8 +14,8 @@ import java.util.*;
 public class GameManager {
 
     private BasicPack pack; //базовая колода
-    private int firstTurnPlayerIndex;
-    private int howManyPlayers;  //индекс игрока с правом первого хода и стартовое число игроков
+    private int firstTurnPlayerIndex; //индекс игрока с правом первого хода
+    private int howManyPlayers;  //стартовое число игроков
     private String loser; //имя проигравшего
     private final List<String> winners = new ArrayList<>(); //имена победивших
     private List<Player> players; //игроки
@@ -177,9 +176,9 @@ public class GameManager {
                     Card attackerCard;
 
                     //спрашиваем у игрока, какую в данный момент карту он хочет подкинуть
-                    int attackCardIndex = PlayerService.whatToDiscard(action.getAttackValidCardsIndices(attacker.getCards()));
+                    int attackCardIndex = PlayerService.whatToDiscard(action.getCardsIndicesValidForAttack(attacker.getCards()));
                     if (attackCardIndex == -1) {
-                        break; //не может ничего больше подкинуть
+                        break; //не подкидывает
                     } else {
                         //иначе извлекаем подкинутую карту у игрока и добавляем на стол
                         attackerCard = attacker.getCard(attackCardIndex);
@@ -189,7 +188,7 @@ public class GameManager {
 
                     //спрашиваем у отбивающегося, какой картой он планирует крыть подкинутую карту
                     int defenceCardIndex = PlayerService.whatToDiscard(
-                            GameAction.getDefenceValidCardsIndices(defender.getCards(), attackerCard, pack.getTrumpCard().getSuit()));
+                            GameAction.getCardsIndicesValidForDefence(defender.getCards(), attackerCard, pack.getTrumpCard().getSuit()));
 
                     if (defenceCardIndex == -1) {
                         isDefenceSuccessful = false; //отбиться не смог, переход к следующему подкидывающему - вдогонку

@@ -12,7 +12,7 @@ public class GameAction {
     private boolean defenceResult; //результат - отбился или нет
     private final Map<Card, Card> defenceMap = new HashMap<>(); //какая карта какой была покрыта
 
-    //подкинутые другими игроками карты. Для дальнейшей распечатки важно, чтобы сохранялся порядок вставки
+    //подкинутые другими игроками карты. Для дальнейшей распечатки важно, чтобы сохранялся порядок вставки, поэтому LinkedMap
     private final Map<String, List<Card>> attackers = new LinkedHashMap<>();
 
     public GameAction(String defender) {
@@ -135,7 +135,7 @@ public class GameAction {
      * @param cards список карт
      * @return список номеров
      */
-    public List<Integer> getAttackValidCardsIndices(List<Card> cards) {
+    public List<Integer> getCardsIndicesValidForAttack(List<Card> cards) {
         List<Integer> validIndices = new ArrayList<>();
         int i = 1;
 
@@ -156,7 +156,7 @@ public class GameAction {
      * @param trumpSuit козырная масть
      * @return список номеров
      */
-    public static List<Integer> getDefenceValidCardsIndices(List<Card> defenderCards, Card attackerCard, Suit trumpSuit) {
+    public static List<Integer> getCardsIndicesValidForDefence(List<Card> defenderCards, Card attackerCard, Suit trumpSuit) {
         List<Integer> validIndices = new ArrayList<>();
         int i = 1;
 

@@ -19,7 +19,6 @@ public class Player {
     private final List<Card> cards = new ArrayList<>(DEFAULT_CARDS_NUMBER_PER_PLAYER); //список карт
     private final String userIdentifier;
 
-
     /**
      * @param userIdentifier никнейм игрока
      */
