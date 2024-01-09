@@ -188,7 +188,7 @@ public class GameManager {
 
                     //спрашиваем у отбивающегося, какой картой он планирует крыть подкинутую карту
                     int defenceCardIndex = PlayerService.whatToDiscard(
-                            GameAction.getCardsIndicesValidForDefence(defender.getCards(), attackerCard, pack.getTrumpCard().getSuit()));
+                            GameService.getCardsIndicesValidForDefence(defender.getCards(), attackerCard, pack.getTrumpCard().getSuit()));
 
                     if (defenceCardIndex == -1) {
                         isDefenceSuccessful = false; //отбиться не смог, переход к следующему подкидывающему - вдогонку
